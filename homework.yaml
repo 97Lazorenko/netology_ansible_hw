@@ -1,0 +1,40 @@
+---
+- name: netology-ml
+  hosts: netology-ml
+  become: yes
+  vars:
+    common_packages:
+      - net-tools
+      - git
+      - tree
+      - htop
+      - mc
+      - vim
+    users:
+      - devops_1
+      - test_1
+
+  tasks:
+    - name: Проверить доступность хоста через ping
+      ansible.builtin.ping:
+
+    - name: Обновить кеш пакетов
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Установить необходимые пакеты
+      ansible.builtin.apt:
+        name: "{{ common_packages }}"
+        state: present
+
+    - name: Копировать test.txt на сервер
+      ansible.builtin.copy:
+        src: test.txt
+        dest: /tmp/test.txt
+
+    - name: Создать пользователей и домашние директории
+      ansible.builtin.user:
+        name: "{{ item }}"
+        state: present
+        create_home: yes
+      loop: "{{ users }}"
